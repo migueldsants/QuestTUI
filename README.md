@@ -41,7 +41,7 @@ track the one that matters, and get a small celebration every time you finish so
 | **Markdown notes** | A built-in editor with live preview, formatting shortcuts, list continuation, a vim mode, and an escape hatch to your real `$EDITOR`. |
 | **Achievements** | Streaks, best days, weekly charts and medals, all from your own history. |
 | **Reminders** | Native notifications on Windows (through WSL) or Linux, even with the journal closed. |
-| **Made to look good** | Nine themes for dark and light terminals, Nerd Font icons, animated borders, particles, fireworks, optional sound effects. |
+| **Made to look good** | Thirteen themes for dark and light terminals, Nerd Font icons, animated borders, particles, fireworks, optional sound effects. |
 | **Two languages** | English and Portuguese, switchable at any time with `^L`. |
 
 ## A tour
@@ -86,6 +86,12 @@ Pick one with `t`, or [make your own](#custom-themes).
 **For dark terminals:** `heroi`, `reino`, `sombrio`, `masmorra` and `cristal`.
 
 <img src="docs/images/themes.gif" alt="Switching between the dark themes" width="900">
+
+**Inspired by the 16-bit console** (also dark): `controle` (the four colored buttons), `lavanda`
+(the gray console with purple buttons), `cartucho` (gray cartridge, red label, gold contacts) and
+`modo7` (Mode 7 sunset skies).
+
+<img src="docs/images/themes-retro.gif" alt="Switching between the themes inspired by the 16-bit console" width="900">
 
 **For light terminals:** `alvorada`, `pergaminho` and `nuvem`. The notes and the markdown preview
 switch to a light style with them.
@@ -217,7 +223,8 @@ Every option also accepts its Portuguese name (`--prazo`, `--principal`, ...).
 Settings live in `~/.config/questtui/config.toml` and are saved as you change them in the app.
 
 ```toml
-theme = "heroi"           # dark: heroi, reino, sombrio, masmorra, cristal
+theme = "heroi"           # dark: heroi, reino, sombrio, masmorra, cristal,
+                          #       controle, lavanda, cartucho, modo7
                           # light: alvorada, pergaminho, nuvem · any: mono
 icons = "nerd"            # nerd, unicode, ascii
 lang = "en"               # en, pt

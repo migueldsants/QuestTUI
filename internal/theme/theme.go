@@ -37,8 +37,10 @@ func (t Theme) Light() bool {
 
 // Builtin devolve os temas que vêm com o app. As paletas seguem o jeito dos
 // jogos de aventura de 16 bits: poucas cores, bem saturadas, com molduras de
-// linha dupla. Os primeiros são para terminais escuros (texto creme); alvorada,
-// pergaminho e nuvem são para terminais claros (texto escuro).
+// linha dupla. Os primeiros são para terminais escuros (texto creme): os do
+// mundo do herói e os inspirados no console de 16 bits (controle, lavanda,
+// cartucho, modo7). Alvorada, pergaminho e nuvem são para terminais claros
+// (texto escuro).
 func Builtin() []Theme {
 	return []Theme{
 		{
@@ -65,6 +67,26 @@ func Builtin() []Theme {
 			// Gelo e magia: ciano, lilás e um amarelo pálido.
 			Name: "cristal", Fg: "#e8f4f8", Muted: "#7090a0", Accent: "#68e0f0", Accent2: "#c890f8", Accent3: "#f8f0a0",
 			BorderColor: "#3880a0", Done: "#60c8a8", Danger: "#f06878", Selection: "#10303c", Border: "double",
+		},
+		{
+			// Os quatro botões do controle de 16 bits: amarelo, verde, azul e vermelho.
+			Name: "controle", Fg: "#ece8f2", Muted: "#8a8799", Accent: "#f7c518", Accent2: "#4cc25a", Accent3: "#5a8cf0",
+			BorderColor: "#5b5870", Done: "#4cc25a", Danger: "#ec4148", Selection: "#24222e", Border: "double",
+		},
+		{
+			// O console americano: carcaça cinza e botões roxos.
+			Name: "lavanda", Fg: "#e8e4f6", Muted: "#8c86ad", Accent: "#b9a8ff", Accent2: "#8f7ae6", Accent3: "#d6d4e2",
+			BorderColor: "#4b4280", Done: "#8fd18a", Danger: "#ff6b8a", Selection: "#1e1938", Border: "double",
+		},
+		{
+			// O cartucho: plástico cinza, etiqueta vermelha e contatos dourados.
+			Name: "cartucho", Fg: "#dcdce4", Muted: "#7d7d8c", Accent: "#ef4b46", Accent2: "#b1b1c2", Accent3: "#f2b544",
+			BorderColor: "#4c4c58", Done: "#6cbf6c", Danger: "#ff6f91", Selection: "#26262e", Border: "thick",
+		},
+		{
+			// Mode 7: céus de pôr do sol em magenta, ciano e laranja.
+			Name: "modo7", Fg: "#f2e9ff", Muted: "#8f7fa8", Accent: "#ff7ac8", Accent2: "#46d4e0", Accent3: "#ffb85c",
+			BorderColor: "#5a3f86", Done: "#7ee08a", Danger: "#ff5a5a", Selection: "#2a1840", Border: "double",
 		},
 		{
 			// Claro: o herói ao amanhecer. Verde, âmbar e azul sobre fundo claro.

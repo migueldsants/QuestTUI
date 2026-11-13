@@ -12,6 +12,7 @@ import (
 func TestLight(t *testing.T) {
 	light := map[string]bool{
 		"heroi": false, "reino": false, "sombrio": false, "masmorra": false, "cristal": false,
+		"controle": false, "lavanda": false, "cartucho": false, "modo7": false,
 		"alvorada": true, "pergaminho": true, "nuvem": true, "mono": false,
 	}
 	themes := Builtin()
@@ -46,13 +47,19 @@ func contrast(a, b colorful.Color) float64 {
 	return math.Max(la, lb) / math.Min(la, lb)
 }
 
-// Nos temas claros, o texto e os destaques precisam ser legíveis sobre um
-// fundo branco: contraste de pelo menos 3:1.
-func TestLightThemesContrast(t *testing.T) {
+// O texto e os destaques precisam ser legíveis sobre o fundo do terminal:
+// contraste de pelo menos 3:1 com o branco (temas claros) ou com um fundo
+// quase preto (temas escuros).
+func TestThemesContrast(t *testing.T) {
 	white, _ := colorful.Hex("#ffffff")
+	dark, _ := colorful.Hex("#0f1219")
 	for _, th := range Builtin() {
-		if !th.Light() {
-			continue
+		if th.Name == "mono" {
+			continue // usa as cores do terminal
+		}
+		bg := dark
+		if th.Light() {
+			bg = white
 		}
 		colors := map[string]string{"fg": th.Fg, "accent": th.Accent, "accent2": th.Accent2,
 			"accent3": th.Accent3, "done": th.Done, "danger": th.Danger}
@@ -61,8 +68,8 @@ func TestLightThemesContrast(t *testing.T) {
 			if err != nil {
 				t.Fatalf("%s.%s: %v", th.Name, name, err)
 			}
-			if r := contrast(c, white); r < 3 {
-				t.Errorf("%s.%s (%s): contraste %.2f com o branco", th.Name, name, col, r)
+			if r := contrast(c, bg); r < 3 {
+				t.Errorf("%s.%s (%s): contraste %.2f com o fundo", th.Name, name, col, r)
 			}
 		}
 	}

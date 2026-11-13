@@ -13,7 +13,7 @@ mkdir -p docs/images
 
 tapes=("$@")
 if [ ${#tapes[@]} -eq 0 ]; then
-  tapes=(screens hero celebrations finale vigil notes themes light)
+  tapes=(screens hero celebrations finale vigil notes themes retro light)
 fi
 for t in "${tapes[@]}"; do
   echo "recording $t"
