@@ -28,6 +28,19 @@ func blend(a, b string, t float64) string {
 	return ca.BlendLab(cb, t).Clamped().Hex()
 }
 
+// ink é a cor de texto legível sobre o fundo bg: preto em fundos claros,
+// branco em fundos escuros. Cores ANSI (sem hex) ficam com preto.
+func ink(bg string) string {
+	c, err := colorful.Hex(bg)
+	if err != nil {
+		return "#000000"
+	}
+	if l, _, _ := c.Lab(); l < 0.6 {
+		return "#ffffff"
+	}
+	return "#000000"
+}
+
 // paint aplica a cor ao estilo, ignorando cor vazia.
 func paint(st lipgloss.Style, color string) lipgloss.Style {
 	if color == "" {

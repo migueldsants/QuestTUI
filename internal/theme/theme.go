@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 type Theme struct {
@@ -24,9 +25,20 @@ type Theme struct {
 	Border      string `toml:"border"`    // rounded, normal, thick, double, hidden
 }
 
+// Light diz se o tema é para terminais de fundo claro: o texto dele é escuro.
+func (t Theme) Light() bool {
+	c, err := colorful.Hex(t.Fg)
+	if err != nil {
+		return false
+	}
+	l, _, _ := c.Lab()
+	return l < 0.5
+}
+
 // Builtin devolve os temas que vêm com o app. As paletas seguem o jeito dos
-// jogos de aventura de 16 bits: poucas cores, bem saturadas, sobre fundo
-// escuro, com texto creme e molduras de linha dupla.
+// jogos de aventura de 16 bits: poucas cores, bem saturadas, com molduras de
+// linha dupla. Os primeiros são para terminais escuros (texto creme); alvorada,
+// pergaminho e nuvem são para terminais claros (texto escuro).
 func Builtin() []Theme {
 	return []Theme{
 		{
@@ -53,6 +65,21 @@ func Builtin() []Theme {
 			// Gelo e magia: ciano, lilás e um amarelo pálido.
 			Name: "cristal", Fg: "#e8f4f8", Muted: "#7090a0", Accent: "#68e0f0", Accent2: "#c890f8", Accent3: "#f8f0a0",
 			BorderColor: "#3880a0", Done: "#60c8a8", Danger: "#f06878", Selection: "#10303c", Border: "double",
+		},
+		{
+			// Claro: o herói ao amanhecer. Verde, âmbar e azul sobre fundo claro.
+			Name: "alvorada", Fg: "#24301f", Muted: "#6f7a68", Accent: "#a46a00", Accent2: "#2f7d32", Accent3: "#1f62b5",
+			BorderColor: "#8db38a", Done: "#2e7d32", Danger: "#c62828", Selection: "#e2efd9", Border: "double",
+		},
+		{
+			// Claro: mapa antigo. Tinta sépia, ferrugem, verde-azulado e roxo.
+			Name: "pergaminho", Fg: "#3a2e1f", Muted: "#8a7658", Accent: "#9c4f12", Accent2: "#2c6e6a", Accent3: "#7b3fa0",
+			BorderColor: "#c2a878", Done: "#5a7a2a", Danger: "#b0322a", Selection: "#efe2c4", Border: "rounded",
+		},
+		{
+			// Claro: o castelo sobre as nuvens. Azul real, ouro e rosa.
+			Name: "nuvem", Fg: "#1d2440", Muted: "#6a7194", Accent: "#3456c0", Accent2: "#b77700", Accent3: "#c03a6b",
+			BorderColor: "#a3aedb", Done: "#2f8a5a", Danger: "#c62828", Selection: "#dfe6fa", Border: "double",
 		},
 		{
 			// Sem cores próprias, para qualquer terminal.

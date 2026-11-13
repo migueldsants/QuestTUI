@@ -14,7 +14,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/harmonica"
 	"github.com/charmbracelet/huh"
-	"github.com/lucasb-eyer/go-colorful"
 
 	"questtui/internal/config"
 	"questtui/internal/lang"
@@ -181,11 +180,22 @@ func (m *Model) applyTheme(t theme.Theme) {
 	m.st = newStyles(t)
 	// O brilho clareia o destaque; em tema de fundo claro (texto escuro), escurece.
 	m.hi = blend(t.Accent, "#ffffff", 0.7)
-	if fg, err := colorful.Hex(t.Fg); err == nil {
-		if l, _, _ := fg.Lab(); l < 0.5 {
-			m.hi = blend(t.Accent, "#000000", 0.6)
-		}
+	if t.Light() {
+		m.hi = blend(t.Accent, "#000000", 0.6)
 	}
+	m.notesKey = "" // as notas são renderizadas com o estilo claro ou escuro
+	if m.notesEd.ed != nil {
+		m.notesEd.ed.SetTheme(m.editorTheme())
+		m.notesEd.prevKey = ""
+	}
+}
+
+// glamourStyle é o estilo do markdown que combina com o tema.
+func (m *Model) glamourStyle() string {
+	if m.th.Light() {
+		return "light"
+	}
+	return "dark"
 }
 
 func (m *Model) Init() tea.Cmd { return tea.Batch(tick(), m.frame()) }

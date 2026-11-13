@@ -41,7 +41,7 @@ track the one that matters, and get a small celebration every time you finish so
 | **Markdown notes** | A built-in editor with live preview, formatting shortcuts, list continuation, a vim mode, and an escape hatch to your real `$EDITOR`. |
 | **Achievements** | Streaks, best days, weekly charts and medals, all from your own history. |
 | **Reminders** | Native notifications on Windows (through WSL) or Linux, even with the journal closed. |
-| **Made to look good** | Six themes, Nerd Font icons, animated borders, particles, fireworks, optional sound effects. |
+| **Made to look good** | Nine themes for dark and light terminals, Nerd Font icons, animated borders, particles, fireworks, optional sound effects. |
 | **Two languages** | English and Portuguese, switchable at any time with `^L`. |
 
 ## A tour
@@ -81,9 +81,18 @@ to open the note in your own editor.
 
 ### Themes
 
-`heroi`, `reino`, `sombrio`, `masmorra`, `cristal` and `mono`, or your own.
+Pick one with `t`, or [make your own](#custom-themes).
 
-<img src="docs/images/themes.gif" alt="Switching between themes" width="900">
+**For dark terminals:** `heroi`, `reino`, `sombrio`, `masmorra` and `cristal`.
+
+<img src="docs/images/themes.gif" alt="Switching between the dark themes" width="900">
+
+**For light terminals:** `alvorada`, `pergaminho` and `nuvem`. The notes and the markdown preview
+switch to a light style with them.
+
+<img src="docs/images/themes-light.gif" alt="Switching between the light themes" width="900">
+
+`mono` uses your terminal's own colors and works on any background.
 
 ### Achievements
 
@@ -208,7 +217,8 @@ Every option also accepts its Portuguese name (`--prazo`, `--principal`, ...).
 Settings live in `~/.config/questtui/config.toml` and are saved as you change them in the app.
 
 ```toml
-theme = "heroi"           # heroi, reino, sombrio, masmorra, cristal, mono
+theme = "heroi"           # dark: heroi, reino, sombrio, masmorra, cristal
+                          # light: alvorada, pergaminho, nuvem · any: mono
 icons = "nerd"            # nerd, unicode, ascii
 lang = "en"               # en, pt
 idle_minutes = 5          # open vigil mode after this many idle minutes (0 = never)
@@ -225,7 +235,8 @@ notes_preview = true
 ### Custom themes
 
 Drop a `.toml` file in `~/.config/questtui/themes/` and it shows up in the theme picker (`t`).
-Missing fields are taken from the default theme.
+Missing fields are taken from the default theme. A theme with dark text (`fg`) is treated as a light
+theme, and the notes switch to a light markdown style with it.
 
 ```toml
 name = "midnight"

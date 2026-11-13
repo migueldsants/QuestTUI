@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/lucasb-eyer/go-colorful"
 	"github.com/mattn/go-runewidth"
 )
 
@@ -118,6 +119,18 @@ func classify(l []rune, fence, inFence bool) []int {
 }
 
 func isRuneStart(s string, i int) bool { return s[i]&0xC0 != 0x80 }
+
+// ink é a cor de texto legível sobre o fundo bg (preto ou branco).
+func ink(bg string) string {
+	c, err := colorful.Hex(bg)
+	if err != nil {
+		return "#000000"
+	}
+	if l, _, _ := c.Lab(); l < 0.6 {
+		return "#ffffff"
+	}
+	return "#000000"
+}
 
 func (e *Editor) style(c int) lipgloss.Style {
 	th := e.theme
@@ -311,7 +324,7 @@ func (e *Editor) View(w, h int) string {
 			st := e.style(runKey.c)
 			switch {
 			case runKey.cur:
-				st = st.Foreground(lipgloss.Color("#000000")).Background(lipgloss.Color(cursorBg))
+				st = st.Foreground(lipgloss.Color(ink(cursorBg))).Background(lipgloss.Color(cursorBg))
 			case runKey.sel && th.Selection != "":
 				st = st.Background(lipgloss.Color(th.Selection))
 			case onCursorLine && th.CursorLine != "":

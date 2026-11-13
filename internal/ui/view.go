@@ -550,7 +550,7 @@ func (m *Model) notes(q store.Quest, width int) string {
 		return m.notesOut
 	}
 	out := q.Notes
-	r, err := glamour.NewTermRenderer(glamour.WithStandardStyle("dark"), glamour.WithWordWrap(width-2))
+	r, err := glamour.NewTermRenderer(glamour.WithStandardStyle(m.glamourStyle()), glamour.WithWordWrap(width-2))
 	if err == nil {
 		if rendered, err := r.Render(q.Notes); err == nil {
 			out = strings.Trim(rendered, "\n")
@@ -594,6 +594,9 @@ func (m *Model) viewThemes() string {
 		}
 		swatch += fg(t.Done).Render("██") + fg(t.Danger).Render("██") + fg(t.Muted).Render("██")
 		name := fmt.Sprintf("%-14s", t.Name)
+		if t.Light() {
+			swatch += m.st.muted.Render(tr("  claro", "  light"))
+		}
 		if i == m.themeCursor {
 			b.WriteString(m.st.accent.Render(m.ic.Cursor+" "+name) + swatch)
 		} else {

@@ -2,7 +2,7 @@
 
 // Seed builds the sample journal used to record the README images.
 //
-//	go run docs/demo/seed.go <config dir> [full|finale]
+//	go run docs/demo/seed.go <config dir> [full|finale] [theme]
 //
 // It writes <config dir>/questtui/config.toml and quests.db, so point
 // XDG_CONFIG_HOME at the same directory when running the app.
@@ -20,7 +20,7 @@ import (
 	"questtui/internal/store"
 )
 
-const config = `theme = "heroi"
+const config = `theme = "%s"
 idle_minutes = 0
 clock_24h = true
 icons = "nerd"
@@ -90,7 +90,7 @@ var perDay = []int{1, 2, 0, 3, 2, 1, 4, 2, 0, 1, 3, 2, 4, 2}
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "usage: go run docs/demo/seed.go <config dir> [full|finale]")
+		fmt.Fprintln(os.Stderr, "usage: go run docs/demo/seed.go <config dir> [full|finale] [theme]")
 		os.Exit(2)
 	}
 	dir := filepath.Join(os.Args[1], "questtui")
@@ -98,9 +98,13 @@ func main() {
 	if len(os.Args) > 2 {
 		scenario = os.Args[2]
 	}
+	theme := "heroi"
+	if len(os.Args) > 3 {
+		theme = os.Args[3]
+	}
 	must(os.RemoveAll(dir))
 	must(os.MkdirAll(dir, 0o755))
-	must(os.WriteFile(filepath.Join(dir, "config.toml"), []byte(config), 0o644))
+	must(os.WriteFile(filepath.Join(dir, "config.toml"), []byte(fmt.Sprintf(config, theme)), 0o644))
 
 	dbPath := filepath.Join(dir, "quests.db")
 	s, err := store.Open(dbPath)

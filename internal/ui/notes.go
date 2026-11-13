@@ -47,8 +47,17 @@ func (m *Model) editorTheme() editor.Theme {
 		Fg: fg, Muted: m.th.Muted, Accent: m.th.Accent, Accent2: m.th.Accent2, Accent3: m.accent3(),
 		Done: m.th.Done, Danger: m.th.Danger, Border: m.th.BorderColor,
 		CursorLine: m.th.Selection,
-		Selection:  blend(m.th.Accent2, "#000000", 0.55),
+		Selection:  m.selectionColor(),
 	}
+}
+
+// selectionColor é o fundo da seleção visual: o destaque escurecido nos
+// temas escuros e clareado nos claros.
+func (m *Model) selectionColor() string {
+	if m.th.Light() {
+		return blend(m.th.Accent2, "#ffffff", 0.7)
+	}
+	return blend(m.th.Accent2, "#000000", 0.55)
 }
 
 func (m *Model) openNotes(q store.Quest) {
@@ -300,7 +309,7 @@ func (m *Model) notesStatus(w int) string {
 	if s.Insert {
 		bg = m.accent3()
 	}
-	badge := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#000000")).
+	badge := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(ink(bg))).
 		Background(lipgloss.Color(bg)).Render(" " + s.Mode + " ")
 
 	info := ""
@@ -339,10 +348,10 @@ func (m *Model) notesHints(w int) string {
 func (m *Model) previewLines(w, h int) []string {
 	n := &m.notesEd
 	text := n.ed.Text()
-	key := fmt.Sprintf("%d|%s", w, text)
+	key := fmt.Sprintf("%d|%s|%s", w, m.glamourStyle(), text)
 	if key != n.prevKey {
 		out := text
-		if r, err := glamour.NewTermRenderer(glamour.WithStandardStyle("dark"), glamour.WithWordWrap(max(10, w-2))); err == nil {
+		if r, err := glamour.NewTermRenderer(glamour.WithStandardStyle(m.glamourStyle()), glamour.WithWordWrap(max(10, w-2))); err == nil {
 			if rendered, err := r.Render(text); err == nil {
 				out = strings.Trim(rendered, "\n")
 			}

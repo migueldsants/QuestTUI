@@ -40,6 +40,23 @@ func TestPutCell(t *testing.T) {
 	}
 }
 
+// O texto sobre um fundo colorido fica preto nos fundos claros e branco nos
+// escuros.
+func TestInk(t *testing.T) {
+	cases := map[string]string{
+		"#f8d038": "#000000", // destaque do heroi
+		"#a46a00": "#ffffff", // destaque da alvorada
+		"#3456c0": "#ffffff", // destaque da nuvem
+		"#68e0f0": "#000000", // destaque do cristal
+		"15":      "#000000", // cor ANSI
+	}
+	for bg, want := range cases {
+		if got := ink(bg); got != want {
+			t.Errorf("ink(%s) = %s, esperava %s", bg, got, want)
+		}
+	}
+}
+
 // Muitas trocas na mesma linha não podem fazê-la crescer sem controle: era
 // esse o travamento ao concluir uma quest.
 func TestPutCellDoesNotBlowUp(t *testing.T) {
