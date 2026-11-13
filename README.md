@@ -28,7 +28,6 @@ track the one that matters, and get a small celebration every time you finish so
 - [Command line](#command-line)
 - [Configuration](#configuration)
 - [Recording the demos](#recording-the-demos)
-- [Built with](#built-with)
 
 ## Features
 
@@ -253,18 +252,6 @@ Every image in this README is generated with [VHS](https://github.com/charmbrace
 docs/demo/record.sh              # every tape
 docs/demo/record.sh hero vigil   # just some of them
 ```
-
-## Built with
-
-The [Charm](https://charm.sh) stack:
-[Bubble Tea](https://github.com/charmbracelet/bubbletea),
-[Lip Gloss](https://github.com/charmbracelet/lipgloss),
-[Bubbles](https://github.com/charmbracelet/bubbles),
-[Huh](https://github.com/charmbracelet/huh),
-[Harmonica](https://github.com/charmbracelet/harmonica),
-[Glamour](https://github.com/charmbracelet/glamour) and
-[Fang](https://github.com/charmbracelet/fang),
-plus [modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite).
 
 ## License
 
