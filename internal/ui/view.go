@@ -141,12 +141,12 @@ func (m *Model) footer() string {
 		return " " + m.st.accent.Render(ansi.Truncate(m.ic.Spark+" "+m.note, m.w-2, "…"))
 	}
 	help := tr(
-		"espaço avança · n nova · e editar · o notas · a etapas · r rastrear · p prioridade · f foco · s conquistas · t temas · ^L english · ? ajuda",
-		"space advance · n new · e edit · o notes · a steps · r track · p priority · f focus · s achievements · t themes · ^L português · ? help")
+		"espaço avança · n nova · e editar · o notas · a etapas · r rastrear · p prioridade · f foco · s conquistas · t temas · ^L english",
+		"space advance · n new · e edit · o notes · a steps · r track · p priority · f focus · s achievements · t themes · ^L português")
 	if m.doneTab {
 		help = tr(
-			"espaço reabre · e editar · d apaga · c volta para as ativas · / filtrar · ? ajuda",
-			"space reopens · e edit · d delete · c back to active · / filter · ? help")
+			"espaço reabre · e editar · d apaga · c volta para as ativas · / filtrar",
+			"space reopens · e edit · d delete · c back to active · / filter")
 	}
 	if m.focusSteps {
 		help = tr(
@@ -156,7 +156,11 @@ func (m *Model) footer() string {
 	if m.filter != "" {
 		help = m.ic.Filter + " " + m.filter + tr(" (esc limpa) · ", " (esc clears) · ") + help
 	}
-	return " " + m.st.muted.Render(ansi.Truncate(help, m.w-2, "…"))
+	// O atalho da ajuda fica sempre visível, no canto direito.
+	tag := m.st.accent.Render("? "+tr("atalhos", "shortcuts")) + " "
+	room := max(0, m.w-lipgloss.Width(tag)-4)
+	left := " " + m.st.muted.Render(ansi.Truncate(help, room, "…"))
+	return left + strings.Repeat(" ", max(1, m.w-lipgloss.Width(left)-lipgloss.Width(tag))) + tag
 }
 
 // pane desenha um painel com borda; outerW e outerH incluem a borda.
@@ -606,38 +610,5 @@ func (m *Model) viewThemes() string {
 	}
 	b.WriteString("\n")
 	b.WriteString(m.st.muted.Render(tr("↑↓ pré-visualiza · enter aplica · esc cancela", "↑↓ preview · enter apply · esc cancel")))
-	return b.String()
-}
-
-func (m *Model) viewHelp() string {
-	keys := [][2]string{
-		{"↑ ↓ / j k", tr("mover", "move")},
-		{"shift ↑ ↓ / K J", tr("mudar a quest (ou a etapa) de lugar", "move the quest (or the step) up or down")},
-		{tr("espaço", "space"), tr("avançar: conclui o objetivo atual, depois a quest", "advance: completes the current objective, then the quest")},
-		{"u", tr("voltar uma etapa (ou reabrir a quest)", "go back one step (or reopen the quest)")},
-		{"tab / → ←", tr("alternar entre lista e etapas", "switch between list and steps")},
-		{"n", tr("nova quest", "new quest")},
-		{"e", tr("editar a quest; nas etapas, renomear a etapa", "edit the quest; in the steps, rename the step")},
-		{"a", tr("adicionar etapas", "add steps")},
-		{"o", tr("notas: editor de markdown (prévia, modo vim)", "notes: markdown editor (preview, vim mode)")},
-		{"d", tr("apagar quest ou etapa", "delete quest or step")},
-		{"r", tr("rastrear quest (destaque na vigília)", "track quest (featured in vigil mode)")},
-		{"p", tr("prioridade alta", "high priority")},
-		{"f / F", tr("modo foco: iniciar ou pausar / parar", "focus mode: start or pause / stop")},
-		{"s", tr("conquistas", "achievements")},
-		{"c / 1 2", tr("alternar entre as abas Ativas e Concluídas", "switch between the Active and Completed tabs")},
-		{"/", tr("filtrar pelo título", "filter by title")},
-		{"t", tr("trocar tema", "change theme")},
-		{"i", tr("trocar ícones (nerd, unicode, ascii)", "change icons (nerd, unicode, ascii)")},
-		{"m", tr("ligar ou desligar o som", "turn sound on or off")},
-		{"^L", tr("trocar idioma (português, inglês)", "change language (Portuguese, English)")},
-		{"z", tr("modo vigília (relógio)", "vigil mode (clock)")},
-		{"q", tr("sair", "quit")},
-	}
-	var b strings.Builder
-	for _, k := range keys {
-		b.WriteString(m.st.accent.Render(fmt.Sprintf("%-16s", k[0])) + m.st.text.Render(k[1]) + "\n")
-	}
-	b.WriteString("\n" + m.st.muted.Render(tr("qualquer tecla fecha", "any key closes")))
 	return b.String()
 }

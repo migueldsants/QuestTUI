@@ -374,67 +374,16 @@ func (m *Model) previewLines(w, h int) []string {
 
 // notesHelp lista os atalhos do editor.
 func (m *Model) notesHelp(w, h int) []string {
-	group := func(title string, rows [][2]string) []string {
-		out := []string{m.section(m.ic.Steps, title, w)}
-		for _, r := range rows {
-			out = append(out, m.st.accent.Render(fmt.Sprintf("%-10s", r[0]))+" "+m.st.text.Render(r[1]))
-		}
-		return append(out, "")
+	groups := []keyGroup{
+		{tr("GERAL", "GENERAL"), m.editorGeneralKeys()},
+		{"MARKDOWN", m.markdownKeys()},
 	}
-	var lines []string
-	lines = append(lines, group(tr("GERAL", "GENERAL"), [][2]string{
-		{"^S", tr("salvar", "save")},
-		{"^Q", tr("fechar (salva)", "close (saves)")},
-		{"^P", tr("prévia do markdown", "markdown preview")},
-		{"^F", tr("expandir / reduzir", "expand / shrink")},
-		{"^T", tr("modo vim / modo padrão", "vim / standard mode")},
-		{"^E", tr("abrir no vim (editor externo)", "open in vim (external editor)")},
-		{"^G", tr("mostrar / esconder atalhos", "show / hide shortcuts")},
-	})...)
-	lines = append(lines, group("MARKDOWN", [][2]string{
-		{"alt+b", tr("negrito", "bold")},
-		{"alt+i", tr("itálico", "italic")},
-		{"alt+s", tr("riscado", "strikethrough")},
-		{"alt+c", tr("código", "code")},
-		{"alt+k", "link"},
-		{"alt+1 2 3", tr("título", "heading")},
-		{"alt+l", tr("lista", "list")},
-		{"alt+t", tr("tarefa: criar / marcar", "task: add / check")},
-		{"alt+q", tr("citação", "quote")},
-		{"enter", tr("continua listas e tarefas", "continues lists and tasks")},
-	})...)
 	if m.notesEd.ed.Vim() {
-		lines = append(lines, group("VIM", [][2]string{
-			{"i a I A o O", tr("inserir", "insert")},
-			{"esc", tr("modo normal", "normal mode")},
-			{"h j k l", tr("mover", "move")},
-			{"w b e", tr("palavras", "words")},
-			{"0 ^ $", tr("início / fim da linha", "line start / end")},
-			{"gg G { }", tr("topo / fim / parágrafo", "top / end / paragraph")},
-			{"d c y", tr("apagar / trocar / copiar + movimento", "delete / change / yank + motion")},
-			{"dd cc yy", tr("a linha inteira", "the whole line")},
-			{"x X D C", tr("apagar caractere / até o fim", "delete char / to the end")},
-			{"p P", tr("colar depois / antes", "put after / before")},
-			{"u ^R", tr("desfazer / refazer", "undo / redo")},
-			{"v V", tr("seleção / seleção de linhas", "visual / visual line")},
-			{"> <", tr("recuar", "indent")},
-			{"J ~ r", tr("juntar / maiúscula / trocar", "join / case / replace")},
-			{"/ n N", tr("buscar", "search")},
-			{":w :q :wq", tr("salvar / fechar", "write / quit")},
-			{":q!", tr("fechar sem salvar", "quit without saving")},
-			{tr("3j 2dd", "3j 2dd"), tr("número repete o comando", "a count repeats it")},
-		})...)
+		groups = append(groups, keyGroup{"VIM", m.vimKeys()})
 	} else {
-		lines = append(lines, group(tr("EDIÇÃO", "EDITING"), [][2]string{
-			{"^Z ^Y", tr("desfazer / refazer", "undo / redo")},
-			{"^K", tr("recortar linha (repetir acumula)", "cut line (repeat to add)")},
-			{"^U", tr("colar", "paste")},
-			{"^W", tr("apagar palavra", "delete word")},
-			{"tab", tr("recuar item / inserir espaços", "indent item / insert spaces")},
-			{"^← ^→", tr("pular palavras", "jump words")},
-			{"esc", tr("fechar (salva)", "close (saves)")},
-		})...)
+		groups = append(groups, keyGroup{tr("EDIÇÃO", "EDITING"), m.editingKeys()})
 	}
+	lines := m.keyLines(groups, w)
 	if len(lines) > h {
 		lines = lines[:h]
 	}

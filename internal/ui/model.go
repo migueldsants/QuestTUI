@@ -135,6 +135,8 @@ type Model struct {
 	input     textinput.Model
 	inputKind inputKind
 
+	helpOff int // rolagem da tela de atalhos
+
 	themeCursor int
 	prevTheme   theme.Theme
 
@@ -467,7 +469,9 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m.updateConfirm(key)
 	case modeThemes:
 		return m.updateThemes(key)
-	case modeHelp, modeStats:
+	case modeHelp:
+		return m.updateHelp(key)
+	case modeStats:
 		m.mode = modeList
 		return m, nil
 	case modeVigil:
@@ -611,8 +615,8 @@ func (m *Model) updateList(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.mode = modeThemes
 	case "z":
 		m.enterVigil()
-	case "?":
-		m.mode = modeHelp
+	case "?", "f1":
+		m.openHelp()
 	}
 	return m, nil
 }
@@ -1059,6 +1063,9 @@ func (m *Model) updateVigil(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 	case "f":
 		m.focusToggle()
+		return m, nil
+	case "?", "f1":
+		m.openHelp()
 		return m, nil
 	}
 	m.mode = modeList

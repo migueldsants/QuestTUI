@@ -143,7 +143,7 @@ quest list                              # pending quests
 quest done 3                            # complete quest #3
 ```
 
-In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` tracks, `o` opens the notes, and `?` shows every shortcut.
+In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` tracks, `o` opens the notes, and `?` (or `F1`) shows every shortcut, always one key away in the bottom-right corner.
 
 ## Keyboard shortcuts
 
@@ -171,7 +171,7 @@ In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` track
 | `i` | icons: Nerd Font, Unicode, ASCII |
 | `m` | sound on or off |
 | `^L` | English / Portuguese |
-| `?` | help |
+| `?` / `F1` | every shortcut in the app, in one scrollable screen |
 | `q` | quit |
 
 ### Notes editor

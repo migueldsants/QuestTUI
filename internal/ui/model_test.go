@@ -2,10 +2,12 @@ package ui
 
 import (
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/ansi"
 
 	"questtui/internal/config"
 	"questtui/internal/store"
@@ -305,6 +307,48 @@ func TestSkyIsSmooth(t *testing.T) {
 	}
 	if same == len(a) {
 		t.Fatal("o céu não se moveu em 4 s")
+	}
+}
+
+// ? e F1 abrem os atalhos; a lista rola, cabe na tela e qualquer outra tecla
+// fecha. O atalho da ajuda aparece no rodapé em qualquer largura.
+func TestHelpScreen(t *testing.T) {
+	m := newTestModel(t)
+	frames(m, 30) // passa a animação de abertura
+	for _, w := range []int{60, 100, 160} {
+		m.Update(tea.WindowSizeMsg{Width: w, Height: 26})
+		footer := splitLines(ansi.Strip(m.View()))
+		if last := footer[len(footer)-1]; !strings.Contains(last, "? atalhos") {
+			t.Fatalf("largura %d: rodapé sem o atalho da ajuda: %q", w, last)
+		}
+	}
+	m.Update(tea.WindowSizeMsg{Width: 100, Height: 26})
+
+	for _, k := range []tea.KeyMsg{{Type: tea.KeyRunes, Runes: []rune("?")}, {Type: tea.KeyF1}} {
+		m.Update(k)
+		if m.mode != modeHelp {
+			t.Fatalf("%v não abriu a ajuda", k)
+		}
+		if got := len(splitLines(m.View())); got != 26 {
+			t.Fatalf("ajuda com %d linhas", got)
+		}
+		top := ansi.Strip(m.View())
+		m.Update(tea.KeyMsg{Type: tea.KeyDown})
+		m.Update(tea.KeyMsg{Type: tea.KeyPgDown})
+		if m.helpOff == 0 || ansi.Strip(m.View()) == top {
+			t.Fatal("a ajuda não rolou")
+		}
+		// Rolar além do fim para no fim.
+		for i := 0; i < 50; i++ {
+			m.Update(tea.KeyMsg{Type: tea.KeyPgDown})
+		}
+		if !strings.Contains(ansi.Strip(m.View()), "quest lang") {
+			t.Fatal("o fim da ajuda (linha de comando) não aparece")
+		}
+		m.Update(tea.KeyMsg{Type: tea.KeyEsc})
+		if m.mode != modeList {
+			t.Fatal("esc não fechou a ajuda")
+		}
 	}
 }
 

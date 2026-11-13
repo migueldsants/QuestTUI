@@ -146,7 +146,7 @@ func (m *Model) viewVigil() string {
 
 	hint := tr("qualquer tecla volta ao diário", "any key returns to the journal")
 	if tracked != nil {
-		hint = tr("espaço avança a rastreada · f foco · outra tecla volta", "space advances the tracked quest · f focus · any other key returns")
+		hint = tr("espaço avança a rastreada · f foco · ? atalhos · outra tecla volta", "space advances the tracked quest · f focus · ? shortcuts · any other key returns")
 	}
 	parts = append(parts, "", m.st.muted.Render(fit(hint)))
 
