@@ -89,7 +89,7 @@ func (m *Model) sky() map[int]string {
 	}
 
 	// Estrelas que cintilam, por cima da poeira.
-	glyphs := [3]string{m.ic.Spark, "+", "·"}
+	glyphs := [3]string{m.starGlyph(), "+", "·"}
 	if ascii {
 		glyphs = [3]string{"*", "+", "."}
 	}
@@ -137,4 +137,14 @@ func (m *Model) field(sky map[int]string, y, from, to int) string {
 		}
 	}
 	return string(b)
+}
+
+// starGlyph é a estrela grande do céu. Mesmo com Nerd Font ela é o caractere
+// tipográfico ✦, um brilho leve: o ícone de estrela da Nerd Font é um
+// pictograma cheio, pesado demais para um céu.
+func (m *Model) starGlyph() string {
+	if m.cfg.Icons == "ascii" {
+		return "*"
+	}
+	return "✦"
 }

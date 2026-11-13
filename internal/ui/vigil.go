@@ -188,7 +188,7 @@ func (m *Model) viewVigil() string {
 			glyph := "·"
 			switch {
 			case k == 0:
-				glyph = m.ic.Spark
+				glyph = m.starGlyph()
 			case k < 3:
 				glyph = m.ic.BarFull
 			case k < 5:
