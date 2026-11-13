@@ -59,8 +59,9 @@ func tick() tea.Cmd {
 }
 
 const (
-	fastFrame = time.Second / 30 // enquanto algo se move
-	slowFrame = time.Second / 12 // só brilhos e partículas
+	fastFrame  = time.Second / 30 // enquanto algo se move
+	slowFrame  = time.Second / 12 // só brilhos e partículas
+	vigilFrame = time.Second / 24 // céu da vigília
 
 	remindEvery = 30 * time.Second // de quanto em quanto tempo checar os lembretes
 )
@@ -69,9 +70,12 @@ const (
 // tempo para não gastar CPU.
 func (m *Model) frame() tea.Cmd {
 	d := slowFrame
-	if m.banner.active || m.barPos != m.barTarget() || len(m.sparks) > 0 || len(m.shells) > 0 || m.wiping() ||
-		(m.mode == modeVigil && m.meteorPhase() < 1) {
+	switch {
+	case m.banner.active || m.barPos != m.barTarget() || len(m.sparks) > 0 || len(m.shells) > 0 || m.wiping() ||
+		(m.mode == modeVigil && m.meteorPhase() < 1):
 		d = fastFrame
+	case m.mode == modeVigil:
+		d = vigilFrame // o céu está sempre se movendo
 	}
 	return tea.Tick(d, func(time.Time) tea.Msg { return frameMsg{} })
 }

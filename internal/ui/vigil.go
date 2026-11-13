@@ -160,17 +160,17 @@ func (m *Model) viewVigil() string {
 	x0 := clamp((m.w-blockW)/2, 0, m.w-blockW)
 	y0 := clamp((m.h-len(block))/2, 0, m.h-len(block))
 
-	phase := int(m.t * 1.5)
+	sky := m.sky()
 	rows := make([]string, m.h)
 	for y := 0; y < m.h; y++ {
 		i := y - y0
 		if i < 0 || i >= len(block) {
-			rows[y] = m.field(y, 0, m.w, phase)
+			rows[y] = m.field(sky, y, 0, m.w)
 			continue
 		}
 		line := block[i]
 		pad := strings.Repeat(" ", blockW-lipgloss.Width(line))
-		rows[y] = m.field(y, 0, x0, phase) + line + pad + m.field(y, x0+blockW, m.w, phase)
+		rows[y] = m.field(sky, y, 0, x0) + line + pad + m.field(sky, y, x0+blockW, m.w)
 	}
 
 	// Estrela cadente: risca o céu de tempos em tempos, por fora do bloco.
@@ -207,33 +207,4 @@ const meteorEvery = 11.0 // segundos entre estrelas cadentes
 // nenhuma no céu.
 func (m *Model) meteorPhase() float64 {
 	return math.Mod(m.t, meteorEvery) / 1.1
-}
-
-// field desenha um trecho do céu de partículas que piscam devagar; algumas
-// brilham na cor de destaque.
-func (m *Model) field(y, from, to int, phase int) string {
-	if to <= from {
-		return ""
-	}
-	glyphs := [...]string{"·", "+", "·", " ", " "}
-	// Duas camadas: uma parada e outra que desliza devagar para a esquerda.
-	drift := int(m.t * 0.7)
-	var b strings.Builder
-	for x := from; x < to; x++ {
-		h := hash2(x, y)
-		if h%83 != 0 {
-			h = hash2(x+drift+7919, y)
-			if h%113 != 0 {
-				b.WriteByte(' ')
-				continue
-			}
-		}
-		g := glyphs[(int(h>>8&0xffff)+phase)%len(glyphs)]
-		if h>>4%4 == 0 {
-			b.WriteString(m.st.accent2.Render(g))
-		} else {
-			b.WriteString(m.st.muted.Render(g))
-		}
-	}
-	return b.String()
 }

@@ -273,6 +273,41 @@ func TestFocus(t *testing.T) {
 	}
 }
 
+// O céu da vigília é contínuo: num intervalo curto, a poeira anda menos de
+// uma célula e as estrelas mudam de tom aos poucos.
+func TestSkyIsSmooth(t *testing.T) {
+	m := newTestModel(t)
+	m.t = 10
+	a := m.sky()
+	m.t = 10 + 1.0/24
+	b := m.sky()
+	if len(a) == 0 {
+		t.Fatal("céu vazio")
+	}
+	changed := 0
+	for k, s := range a {
+		if b[k] != s {
+			changed++
+		}
+	}
+	// De um quadro para o outro, só uma parte do céu muda.
+	if changed > len(a)/2 {
+		t.Fatalf("%d de %d células mudaram em 1/24 s", changed, len(a))
+	}
+	// E com o tempo, ele muda de verdade.
+	m.t = 14
+	c := m.sky()
+	same := 0
+	for k, s := range a {
+		if c[k] == s {
+			same++
+		}
+	}
+	if same == len(a) {
+		t.Fatal("o céu não se moveu em 4 s")
+	}
+}
+
 func splitLines(s string) []string {
 	var lines []string
 	start := 0
