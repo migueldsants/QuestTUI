@@ -128,20 +128,18 @@ Then put `quest` somewhere on your `PATH`, for example `~/.local/bin`.
 ## Getting started
 
 ```bash
-quest                                          # open the journal
-quest add "Buy groceries" --due today          # capture a quest without opening it
-quest add "Ship the site" --main --due "friday 18:00" --priority
-quest list                                     # pending quests
-quest done 3                                   # complete quest #3
+quest                                   # open the journal
+quest add "Buy groceries" --due today   # quick capture
+quest add "Ship the site" --main --priority --due "fri 18:00"
+quest list                              # pending quests
+quest done 3                            # complete quest #3
 ```
 
 In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` tracks, `o` opens the notes, and `?` shows every shortcut.
 
 ## Keyboard shortcuts
 
-<table>
-<tr><th>Journal</th><th>Notes editor</th></tr>
-<tr><td valign="top">
+### Journal
 
 | Key | Action |
 |---|---|
@@ -168,7 +166,7 @@ In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` track
 | `?` | help |
 | `q` | quit |
 
-</td><td valign="top">
+### Notes editor
 
 | Key | Action |
 |---|---|
@@ -190,9 +188,6 @@ In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` track
 **Vim mode:** normal, insert and visual modes; `hjkl w b e 0 ^ $ gg G { }`; `d c y` with motions;
 `dd yy cc p P x D C J ~ r`; `u` and `^R`; `/` search with `n N`; counts like `3j` and `2dd`;
 and `:w`, `:q`, `:wq`, `:q!`, `:<line>`.
-
-</td></tr>
-</table>
 
 ## Command line
 
