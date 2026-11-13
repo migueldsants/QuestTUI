@@ -183,3 +183,28 @@ func TestCompleteAndHistory(t *testing.T) {
 		t.Errorf("MarkNotified: primeiro=%v, de novo=%v", first, again)
 	}
 }
+
+func TestDayNotes(t *testing.T) {
+	s, err := Open(filepath.Join(t.TempDir(), "quests.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	day := DateOnly(now)
+	if err := s.SetDayNote(day, "primeira"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.SetDayNote(day, "segunda"); err != nil {
+		t.Fatal(err)
+	}
+	notes, err := s.DayNotes()
+	if err != nil || notes["2026-11-12"] != "segunda" || len(notes) != 1 {
+		t.Fatalf("notes = %v, %v", notes, err)
+	}
+	if err := s.SetDayNote(day, "  \n"); err != nil {
+		t.Fatal(err)
+	}
+	if notes, _ = s.DayNotes(); len(notes) != 0 {
+		t.Errorf("empty note should delete it: %v", notes)
+	}
+}

@@ -3,6 +3,7 @@ package store
 
 import (
 	"database/sql"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -97,6 +98,10 @@ CREATE TABLE IF NOT EXISTS notified (
 	kind     TEXT NOT NULL,
 	mark     TEXT NOT NULL,
 	PRIMARY KEY (quest_id, kind, mark)
+);
+CREATE TABLE IF NOT EXISTS day_notes (
+	day  TEXT PRIMARY KEY, -- AAAA-MM-DD
+	body TEXT NOT NULL
 );
 `
 
@@ -266,6 +271,40 @@ func (s *Store) SetNotes(id int64, notes string) error {
 	_, err := s.db.Exec(`UPDATE quests SET notes = ? WHERE id = ?`, notes, id)
 	return err
 }
+
+// DayNotes devolve as notas do calendário, uma por dia, pela data
+// ("AAAA-MM-DD").
+func (s *Store) DayNotes() (map[string]string, error) {
+	rows, err := s.db.Query(`SELECT day, body FROM day_notes`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	notes := map[string]string{}
+	for rows.Next() {
+		var day, body string
+		if err := rows.Scan(&day, &body); err != nil {
+			return nil, err
+		}
+		notes[day] = body
+	}
+	return notes, rows.Err()
+}
+
+// SetDayNote grava a nota do dia; texto vazio apaga a nota.
+func (s *Store) SetDayNote(day time.Time, body string) error {
+	key := DayKey(day)
+	if strings.TrimSpace(body) == "" {
+		_, err := s.db.Exec(`DELETE FROM day_notes WHERE day = ?`, key)
+		return err
+	}
+	_, err := s.db.Exec(`INSERT INTO day_notes (day, body) VALUES (?, ?)
+		ON CONFLICT(day) DO UPDATE SET body = excluded.body`, key, body)
+	return err
+}
+
+// DayKey é a chave de um dia em DayNotes.
+func DayKey(day time.Time) string { return day.Format(dateLayout) }
 
 func (s *Store) DeleteQuest(id int64) error {
 	tx, err := s.db.Begin()

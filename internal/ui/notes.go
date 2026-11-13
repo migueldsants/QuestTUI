@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
@@ -24,6 +25,8 @@ import (
 type notesState struct {
 	ed      *editor.Editor
 	questID int64
+	day     time.Time // nota de um dia do calendário (zero: nota de quest)
+	back    mode      // para onde o editor volta ao fechar
 	title   string
 	full    bool // expandido para a tela inteira
 	preview bool
@@ -63,7 +66,16 @@ func (m *Model) selectionColor() string {
 func (m *Model) openNotes(q store.Quest) {
 	ed := editor.New(q.Notes, m.cfg.EditorMode == "vim")
 	ed.SetTheme(m.editorTheme())
-	m.notesEd = notesState{ed: ed, questID: q.ID, title: q.Title, preview: m.cfg.NotesPreview}
+	m.notesEd = notesState{ed: ed, questID: q.ID, title: q.Title, back: modeList, preview: m.cfg.NotesPreview}
+	m.mode = modeNotes
+	m.startWipe()
+}
+
+// openDayNote abre no mesmo editor a nota de um dia do calendário.
+func (m *Model) openDayNote(day time.Time) {
+	ed := editor.New(m.dayNotes[store.DayKey(day)], m.cfg.EditorMode == "vim")
+	ed.SetTheme(m.editorTheme())
+	m.notesEd = notesState{ed: ed, day: day, title: capitalize(longDate(day)), back: modeCalendar, preview: m.cfg.NotesPreview}
 	m.mode = modeNotes
 	m.startWipe()
 }
@@ -75,7 +87,11 @@ func (m *Model) saveNotes() bool {
 		return true
 	}
 	text := strings.TrimRight(n.ed.Text(), " \n")
-	if err := m.store.SetNotes(n.questID, text); err != nil {
+	save := func() error { return m.store.SetNotes(n.questID, text) }
+	if !n.day.IsZero() {
+		save = func() error { return m.store.SetDayNote(n.day, text) }
+	}
+	if err := save(); err != nil {
 		m.err = err
 		return false
 	}
@@ -93,7 +109,7 @@ func (m *Model) closeNotes(save bool) {
 		m.flash(tr("notas salvas", "notes saved"))
 	}
 	m.err = nil
-	m.mode = modeList
+	m.mode = m.notesEd.back
 	m.startWipe()
 }
 
@@ -289,7 +305,11 @@ func (m *Model) viewNotes() string {
 
 func (m *Model) notesTitle(w int) string {
 	n := &m.notesEd
-	left := m.st.accent.Render(m.ic.Notes+" "+tr("NOTAS", "NOTES")) + m.st.muted.Render(" · ") + m.st.text.Render(n.title)
+	label := tr("NOTAS", "NOTES")
+	if !n.day.IsZero() {
+		label = tr("NOTA DO DIA", "DAY NOTE")
+	}
+	left := m.st.accent.Render(m.ic.Notes+" "+label) + m.st.muted.Render(" · ") + m.st.text.Render(n.title)
 	right := m.st.done.Render(m.ic.StepDone + tr(" salvo", " saved"))
 	if n.ed.Dirty() {
 		right = m.st.danger.Render("● " + tr("não salvo", "unsaved"))

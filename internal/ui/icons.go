@@ -15,17 +15,19 @@ type icons struct {
 	StepNow  string
 	StepNext string
 
-	Journal string
-	Pending string
-	Clock   string
-	Due     string
-	Late    string
-	Steps   string
-	Notes   string
-	Trophy  string
-	Spark   string
-	Filter  string
-	Theme   string
+	Journal  string
+	Pending  string
+	Clock    string
+	Due      string
+	Late     string
+	Steps    string
+	Notes    string
+	Trophy   string
+	Spark    string
+	Filter   string
+	Theme    string
+	Calendar string
+	Dot      string
 
 	Priority string
 	Focus    string
@@ -49,17 +51,19 @@ var iconSets = map[string]icons{
 		StepNow:  "", // dot-circle-o
 		StepNext: "", // circle-o
 
-		Journal: "", // book
-		Pending: "", // flag
-		Clock:   "", // clock-o
-		Due:     "", // calendar
-		Late:    "", // exclamation-circle
-		Steps:   "", // tasks
-		Notes:   "", // pencil
-		Trophy:  "", // trophy
-		Spark:   "", // star
-		Filter:  "", // search
-		Theme:   "", // paint-brush
+		Journal:  "", // book
+		Pending:  "", // flag
+		Clock:    "", // clock-o
+		Due:      "", // calendar
+		Late:     "", // exclamation-circle
+		Steps:    "", // tasks
+		Notes:    "", // pencil
+		Trophy:   "", // trophy
+		Spark:    "", // star
+		Filter:   "", // search
+		Theme:    "", // paint-brush
+		Calendar: "", // calendar
+		Dot:      "•",
 
 		Priority: "", // fire
 		Focus:    "", // hourglass
@@ -71,7 +75,7 @@ var iconSets = map[string]icons{
 		Cursor: "▸", Main: "◆", Side: "◇", Todo: "○", Done: "●", Tracked: "✦",
 		StepDone: "✓", StepNow: "◉", StepNext: "○",
 		Journal: "◆", Pending: "⚑", Clock: "◷", Due: "◷", Late: "!", Steps: "≡",
-		Notes: "¶", Trophy: "★", Spark: "✦", Filter: "/", Theme: "◐",
+		Notes: "¶", Trophy: "★", Spark: "✦", Filter: "/", Theme: "◐", Calendar: "▦", Dot: "•",
 		Priority: "▲", Focus: "◔", Lock: "☆",
 		BarFull: "━", BarEmpty: "─", Rule: "─",
 	},
@@ -79,7 +83,7 @@ var iconSets = map[string]icons{
 		Cursor: ">", Main: "#", Side: "~", Todo: "o", Done: "x", Tracked: "@",
 		StepDone: "x", StepNow: ">", StepNext: ".",
 		Journal: "#", Pending: "!", Clock: "@", Due: "@", Late: "!", Steps: "=",
-		Notes: "%", Trophy: "*", Spark: "*", Filter: "/", Theme: "%",
+		Notes: "%", Trophy: "*", Spark: "*", Filter: "/", Theme: "%", Calendar: "#", Dot: "*",
 		Priority: "^", Focus: "@", Lock: "-",
 		BarFull: "=", BarEmpty: "-", Rule: "-",
 	},

@@ -35,6 +35,7 @@ track the one that matters, and get a small celebration every time you finish so
 |---|---|
 | **Quests with steps** | Main quests and side quests, broken into steps. `space` completes the current objective and moves on to the next one, like a real quest log. |
 | **Due dates in plain words** | `today`, `tomorrow 14h`, `friday`, `+3d`, `20/11 14:00`. Overdue quests turn red. |
+| **Calendar** | Press `w` for the month at a glance: every deadline marked on its day, overdue ones in red. Pick a day to see its quests, jump to one, create a new quest already due that day, or write a note for the day in the same markdown editor (vim mode and `$EDITOR` included). |
 | **Priority and manual order** | Push urgent quests to the top and reorder the rest with `shift ↑ ↓`. |
 | **Tracked quest** | Pin the quest you are working on; it gets the spotlight everywhere. |
 | **Vigil mode** | A screensaver-like clock that shows what is left to do, with a focus timer. |
@@ -170,6 +171,7 @@ In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` track
 | `p` | high priority |
 | `f` / `F` | focus timer: start or pause / stop |
 | `s` | achievements |
+| `w` | calendar |
 | `c` / `1` `2` | active and completed tabs |
 | `/` | filter |
 | `z` | vigil mode |
@@ -179,6 +181,22 @@ In the journal: `n` creates a quest, `a` adds steps, `space` advances, `r` track
 | `^L` | English / Portuguese |
 | `?` / `F1` | every shortcut in the app, in one scrollable screen |
 | `q` | quit |
+
+### Calendar
+
+| Key | Action |
+|---|---|
+| `← →` / `h l` | previous / next day |
+| `↑ ↓` / `k j` | previous / next week |
+| `[ ]` / `H L` | previous / next month |
+| `{ }` | previous / next year |
+| `.` | back to today |
+| `enter` | open the day's quest in the journal |
+| `tab` | choose among the day's quests |
+| `space` | advance the chosen quest |
+| `n` | new quest due on the selected day |
+| `o` | note for the selected day, in the notes editor |
+| `esc` / `w` | back to the journal |
 
 ### Notes editor
 

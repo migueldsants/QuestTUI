@@ -363,3 +363,120 @@ func splitLines(s string) []string {
 	}
 	return append(lines, s[start:])
 }
+
+// O calendário marca o dia do prazo, lista a quest ao lado, cria quests já
+// com o prazo no dia escolhido e leva de volta ao diário na quest certa.
+func TestCalendar(t *testing.T) {
+	m := newTestModel(t)
+	today := store.DateOnly(time.Now())
+	due := today.AddDate(0, 0, 1).Format("2006-01-02") + " 14:00"
+	if err := m.store.AddQuest(&store.Quest{Title: "Consulta no dentista", Kind: store.Side, Due: due}); err != nil {
+		t.Fatal(err)
+	}
+	m.reload()
+	frames(m, 30) // deixa a abertura terminar
+
+	press := func(k string) {
+		switch k {
+		case "enter", "esc", "tab", "right", "left", "down", "up":
+			m.Update(tea.KeyMsg{Type: map[string]tea.KeyType{
+				"enter": tea.KeyEnter, "esc": tea.KeyEsc, "tab": tea.KeyTab,
+				"right": tea.KeyRight, "left": tea.KeyLeft, "down": tea.KeyDown, "up": tea.KeyUp,
+			}[k]})
+		default:
+			m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(k)})
+		}
+	}
+
+	press("w")
+	if m.mode != modeCalendar {
+		t.Fatalf("mode = %v, want calendar", m.mode)
+	}
+	out := ansi.Strip(m.View())
+	if !strings.Contains(out, capitalize(monthName(today.Month()))) {
+		t.Errorf("month title missing:\n%s", out)
+	}
+	if !strings.Contains(out, "Nenhuma quest com prazo") && !strings.Contains(out, "ATRASADAS") {
+		t.Errorf("today should be empty:\n%s", out)
+	}
+
+	press("l") // amanhã
+	out = ansi.Strip(m.View())
+	if !strings.Contains(out, "Consulta no dentista") || !strings.Contains(out, "14:00") {
+		t.Errorf("tomorrow's quest missing:\n%s", out)
+	}
+
+	// Mês seguinte e volta para hoje.
+	press("]")
+	if m.calDay.Month() == today.AddDate(0, 0, 1).Month() && m.calDay.Year() == today.Year() {
+		t.Errorf("] did not change month: %v", m.calDay)
+	}
+	press(".")
+	if !m.calDay.Equal(today) {
+		t.Errorf(". = %v, want today", m.calDay)
+	}
+
+	// n cria uma quest com o prazo no dia escolhido e volta ao calendário.
+	press("n")
+	if m.mode != modeForm || m.fd.due != today.Format("02/01/2006") {
+		t.Fatalf("form due = %q (mode %v)", m.fd.due, m.mode)
+	}
+	press("esc")
+	if m.mode != modeCalendar {
+		t.Fatalf("esc from form went to %v", m.mode)
+	}
+
+	// enter com uma quest só no dia pula direto para ela no diário.
+	press("l")
+	press("enter")
+	if m.mode != modeList {
+		t.Fatalf("mode = %v, want list", m.mode)
+	}
+	if q := m.selected(); q == nil || q.Title != "Consulta no dentista" {
+		t.Errorf("selected = %+v", q)
+	}
+}
+
+func TestAddMonths(t *testing.T) {
+	d := time.Date(2026, 1, 31, 0, 0, 0, 0, time.Local)
+	if got := addMonths(d, 1); got.Month() != time.February || got.Day() != 28 {
+		t.Errorf("31/01 + 1 = %v", got)
+	}
+	if got := addMonths(d, -1); got.Month() != time.December || got.Year() != 2025 || got.Day() != 31 {
+		t.Errorf("31/01 - 1 = %v", got)
+	}
+}
+
+// o no calendário abre a nota do dia no editor das notas; ao fechar, ela é
+// gravada, o dia ganha a marca e a nota aparece ao lado da grade.
+func TestCalendarDayNote(t *testing.T) {
+	m := newTestModel(t)
+	frames(m, 30)
+	m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("w")})
+	m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("o")})
+	if m.mode != modeNotes || m.notesEd.day.IsZero() {
+		t.Fatalf("mode = %v, day = %v", m.mode, m.notesEd.day)
+	}
+	for _, r := range "Levar o guarda-chuva" {
+		m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{r}})
+	}
+	m.Update(tea.KeyMsg{Type: tea.KeyCtrlQ})
+	if m.mode != modeCalendar {
+		t.Fatalf("closing the day note went to %v", m.mode)
+	}
+	notes, err := m.store.DayNotes()
+	if err != nil || notes[store.DayKey(store.DateOnly(time.Now()))] != "Levar o guarda-chuva" {
+		t.Fatalf("notes = %v, %v", notes, err)
+	}
+	frames(m, 30)
+	if out := ansi.Strip(m.View()); !strings.Contains(out, "guarda-chuva") || !strings.Contains(out, "1 nota") {
+		t.Errorf("day note not shown:\n%s", out)
+	}
+	// A nota da quest continua indo para a quest, e volta para o diário.
+	m.Update(tea.KeyMsg{Type: tea.KeyEsc})
+	m.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune("o")})
+	m.Update(tea.KeyMsg{Type: tea.KeyCtrlQ})
+	if m.mode != modeList {
+		t.Errorf("quest notes closed to %v", m.mode)
+	}
+}

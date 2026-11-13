@@ -38,6 +38,8 @@ func (m *Model) View() string {
 		out = m.modal(m.ic.Trophy, tr("CONQUISTAS", "ACHIEVEMENTS"), m.viewStats())
 	case modeNotes:
 		out = m.viewNotes()
+	case modeCalendar:
+		out = m.viewCalendar()
 	default:
 		out = m.viewMain()
 	}
@@ -141,8 +143,8 @@ func (m *Model) footer() string {
 		return " " + m.st.accent.Render(ansi.Truncate(m.ic.Spark+" "+m.note, m.w-2, "…"))
 	}
 	help := tr(
-		"espaço avança · n nova · e editar · o notas · a etapas · r rastrear · p prioridade · f foco · s conquistas · t temas · ^L english",
-		"space advance · n new · e edit · o notes · a steps · r track · p priority · f focus · s achievements · t themes · ^L português")
+		"espaço avança · n nova · e editar · o notas · a etapas · r rastrear · p prioridade · f foco · w calendário · s conquistas · t temas · ^L english",
+		"space advance · n new · e edit · o notes · a steps · r track · p priority · f focus · w calendar · s achievements · t themes · ^L português")
 	if m.doneTab {
 		help = tr(
 			"espaço reabre · e editar · d apaga · c volta para as ativas · / filtrar",

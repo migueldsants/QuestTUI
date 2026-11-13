@@ -33,6 +33,7 @@ func (m *Model) journalKeys() [][2]string {
 		{"p", tr("prioridade alta", "high priority")},
 		{"f / F", tr("foco: iniciar ou pausar / parar", "focus: start or pause / stop")},
 		{"s", tr("conquistas", "achievements")},
+		{"w", tr("calendário dos prazos", "deadline calendar")},
 		{"c / 1 2", tr("abas Ativas e Concluídas", "Active and Completed tabs")},
 		{"/", tr("filtrar pelo título", "filter by title")},
 		{"z", tr("modo vigília", "vigil mode")},
@@ -61,6 +62,22 @@ func (m *Model) formKeys() [][2]string {
 		{"↑ ↓ / shift+tab", tr("andar entre os campos", "move between fields")},
 		{"← →", tr("escolher tipo e prioridade", "pick the type and priority")},
 		{"esc", tr("cancelar", "cancel")},
+	}
+}
+
+func (m *Model) calendarKeys() [][2]string {
+	return [][2]string{
+		{"← → / h l", tr("dia anterior / próximo", "previous / next day")},
+		{"↑ ↓ / k j", tr("semana anterior / próxima", "previous / next week")},
+		{"[ ] / H L", tr("mês anterior / próximo", "previous / next month")},
+		{"{ }", tr("ano anterior / próximo", "previous / next year")},
+		{".", tr("voltar para hoje", "back to today")},
+		{"enter", tr("abrir a quest do dia no diário", "open the day's quest in the journal")},
+		{"tab", tr("escolher entre as quests do dia", "choose among the day's quests")},
+		{tr("espaço", "space"), tr("avançar a quest escolhida", "advance the chosen quest")},
+		{"n", tr("nova quest com prazo neste dia", "new quest due on this day")},
+		{"o", tr("nota do dia (mesmo editor das notas)", "day note (same editor as the notes)")},
+		{"esc / w", tr("voltar ao diário", "back to the journal")},
 	}
 }
 
@@ -156,6 +173,7 @@ func (m *Model) helpGroups() []keyGroup {
 		{tr("NOTAS: EDIÇÃO", "NOTES: EDITING"), m.editingKeys()},
 		{tr("NOTAS: MARKDOWN", "NOTES: MARKDOWN"), m.markdownKeys()},
 		{tr("NOTAS: MODO VIM (^T)", "NOTES: VIM MODE (^T)"), m.vimKeys()},
+		{tr("CALENDÁRIO (w)", "CALENDAR (w)"), m.calendarKeys()},
 		{tr("VIGÍLIA (z)", "VIGIL (z)"), m.vigilKeys()},
 		{tr("LINHA DE COMANDO", "COMMAND LINE"), m.commandKeys()},
 	}
@@ -216,6 +234,10 @@ func (m *Model) viewHelp() string {
 // openHelp abre a tela de atalhos do começo.
 func (m *Model) openHelp() {
 	m.helpOff = 0
+	m.helpBack = modeList
+	if m.mode == modeCalendar {
+		m.helpBack = modeCalendar
+	}
 	m.mode = modeHelp
 }
 
@@ -235,7 +257,7 @@ func (m *Model) updateHelp(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "end", "G":
 		m.helpOff = 1 << 20
 	default:
-		m.mode = modeList
+		m.mode = m.helpBack
 		return m, nil
 	}
 	m.helpOff = max(0, m.helpOff) // o limite de baixo é acertado ao desenhar

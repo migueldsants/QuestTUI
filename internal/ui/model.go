@@ -36,6 +36,7 @@ const (
 	modeVigil
 	modeStats
 	modeNotes
+	modeCalendar
 )
 
 type inputKind int
@@ -130,12 +131,22 @@ type Model struct {
 
 	mode      mode
 	form      *huh.Form
+	formBack  mode // para onde o formulário volta ao fechar
 	fd        *formData
 	editingID int64
 	input     textinput.Model
 	inputKind inputKind
 
-	helpOff int // rolagem da tela de atalhos
+	helpOff  int  // rolagem da tela de atalhos
+	helpBack mode // para onde a tela de atalhos volta
+
+	// calendário
+	calDay    time.Time // dia escolhido (meia-noite)
+	calList   bool      // foco na lista de quests do dia
+	calCursor int
+	dayNotes  map[string]string // notas do calendário, por dia
+
+	dayNoteKey, dayNoteOut string // cache da nota do dia renderizada
 
 	themeCursor int
 	prevTheme   theme.Theme
@@ -282,6 +293,9 @@ func (m *Model) reload() {
 		return
 	}
 	m.quests = quests
+	if m.dayNotes, err = m.store.DayNotes(); err != nil {
+		m.err = err
+	}
 	m.rebuild(selID)
 }
 
@@ -401,7 +415,7 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tickMsg:
 		m.now = time.Time(msg)
-		if m.mode == modeList || m.mode == modeVigil {
+		if m.mode == modeList || m.mode == modeVigil || m.mode == modeCalendar {
 			// Pega quests adicionadas por fora (quest add) sem precisar reabrir.
 			if m.now.Second()%3 == 0 {
 				m.reload()
@@ -476,6 +490,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case modeVigil:
 		return m.updateVigil(key)
+	case modeCalendar:
+		return m.updateCalendar(key)
 	}
 	return m.updateList(key)
 }
@@ -545,7 +561,7 @@ func (m *Model) updateList(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		}
 
 	case "n":
-		return m, m.openForm(nil)
+		return m, m.openFormFrom(modeList, time.Time{})
 	case "e":
 		switch {
 		case q == nil:
@@ -596,6 +612,8 @@ func (m *Model) updateList(key tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.focusStop()
 	case "s":
 		m.openStats()
+	case "w":
+		m.openCalendar()
 
 	case "c":
 		m.setTab(!m.doneTab)
@@ -827,10 +845,26 @@ func (m *Model) openStats() {
 
 // --- formulário de quest ---
 
+// openFormFrom abre o formulário de uma quest nova a partir da tela back, com
+// o prazo já preenchido quando due não é zero.
+func (m *Model) openFormFrom(back mode, due time.Time) tea.Cmd {
+	cmd := m.openFormWith(nil, due)
+	m.formBack = back
+	return cmd
+}
+
 // openForm abre o formulário de quest: em branco, ou preenchido para editar q.
 func (m *Model) openForm(q *store.Quest) tea.Cmd {
+	return m.openFormWith(q, time.Time{})
+}
+
+func (m *Model) openFormWith(q *store.Quest, due time.Time) tea.Cmd {
 	fd := &formData{kind: string(store.Side)}
+	if !due.IsZero() {
+		fd.due = due.Format("02/01/2006")
+	}
 	m.editingID = 0
+	m.formBack = modeList
 	if q != nil {
 		m.editingID = q.ID
 		fd = &formData{
@@ -897,7 +931,7 @@ func (m *Model) formWidth() int {
 
 func (m *Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if key, ok := msg.(tea.KeyMsg); ok && key.String() == "esc" {
-		m.mode = modeList
+		m.mode = m.formBack
 		return m, nil
 	}
 	f, cmd := m.form.Update(msg)
@@ -906,10 +940,10 @@ func (m *Model) updateForm(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 	switch m.form.State {
 	case huh.StateAborted:
-		m.mode = modeList
+		m.mode = m.formBack
 		return m, nil
 	case huh.StateCompleted:
-		m.mode = modeList
+		m.mode = m.formBack
 		m.saveForm()
 		return m, nil
 	}
