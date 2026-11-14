@@ -49,7 +49,8 @@ track the one that matters, and get a small celebration every time you finish so
 
 ### The journal
 
-Quests on the left, the selected quest on the right: its steps, the current objective, its due date and your notes.
+Quests on the left, with the ones you finished today kept at the bottom; the selected quest on the right: its steps,
+the current objective, its due date and your notes.
 
 <img src="docs/images/journal.png" alt="The journal" width="900">
 
@@ -79,6 +80,14 @@ Press `o` to write notes in markdown. The preview updates as you type, lists and
 to open the note in your own editor.
 
 <img src="docs/images/notes.gif" alt="The markdown notes editor with live preview and vim mode" width="900">
+
+### Calendar
+
+Press `w` for the month at a glance. Every deadline sits on its day (red when it is late), and the side
+panel lists the selected day's quests. `enter` jumps to one in the journal, `n` creates a quest already due
+that day, and `o` writes a note for the day in the same markdown editor.
+
+<img src="docs/images/calendar.gif" alt="The calendar with deadlines and a note for the day" width="900">
 
 ### Themes
 
@@ -117,6 +126,10 @@ switch to a light style with them.
 **Completed quests, grouped by day**
 
 <img src="docs/images/completed.png" alt="The completed tab" width="900">
+
+**The calendar, with today's quests and note**
+
+<img src="docs/images/calendar.png" alt="The calendar screen" width="900">
 
 **Built-in help**
 

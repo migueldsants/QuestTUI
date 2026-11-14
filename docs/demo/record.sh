@@ -7,13 +7,19 @@
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 
+# VHS records through Chromium, which refuses to run as root (the default user
+# in WSL) unless its sandbox is off.
+if [ "$(id -u)" = 0 ]; then
+  export VHS_NO_SANDBOX=true
+fi
+
 go build -o quest .
 go build -o /tmp/qt-seed docs/demo/seed.go
 mkdir -p docs/images
 
 tapes=("$@")
 if [ ${#tapes[@]} -eq 0 ]; then
-  tapes=(screens hero celebrations finale vigil notes themes retro light)
+  tapes=(screens hero celebrations finale vigil notes calendar themes retro light)
 fi
 for t in "${tapes[@]}"; do
   echo "recording $t"

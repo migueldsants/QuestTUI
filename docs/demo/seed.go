@@ -64,7 +64,15 @@ var full = []quest{
 		steps: []string{"Coffee beans", "Oat milk", "Fresh bread"},
 	},
 	{title: "Water the plants"},
-	{title: "Plan the weekend trip"},
+	{title: "Plan the weekend trip", due: "+9d"},
+	{title: "Pay the rent", main: true, due: "+16d"},
+}
+
+// Calendar notes, by days from today.
+var dayNotes = map[int]string{
+	0: "## Today\n\n- Standup at **10:00**\n- [ ] Pick up the package",
+	3: "Mom's birthday dinner, bring the cake",
+	9: "Train leaves at 08:15 from platform 4",
 }
 
 var finale = []quest{
@@ -174,6 +182,11 @@ func main() {
 		}
 		if d.tracked {
 			must(s.ToggleTracked(q.ID))
+		}
+	}
+	if scenario == "full" {
+		for d, text := range dayNotes {
+			must(s.SetDayNote(store.DateOnly(now).AddDate(0, 0, d), text))
 		}
 	}
 	must(s.Close())

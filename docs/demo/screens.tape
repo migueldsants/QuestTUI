@@ -37,3 +37,9 @@ Screenshot docs/images/help.png
 Sleep 1.5s
 Escape
 Sleep 300ms
+Type "w"
+Sleep 2.5s
+Screenshot docs/images/calendar.png
+Sleep 1.5s
+Escape
+Sleep 300ms
