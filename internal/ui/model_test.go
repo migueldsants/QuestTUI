@@ -149,6 +149,8 @@ func TestEventBanners(t *testing.T) {
 	if m.visible[0].Title != "b" {
 		t.Fatalf("primeira ativa: %q", m.visible[0].Title)
 	}
+	// O cursor ainda está na quest concluída hoje, no fim da lista.
+	key("g")
 	key("J")
 	if m.visible[1].Title != "b" || m.selected().Title != "b" {
 		t.Fatal("shift+baixo não moveu a quest")
@@ -478,5 +480,36 @@ func TestCalendarDayNote(t *testing.T) {
 	m.Update(tea.KeyMsg{Type: tea.KeyCtrlQ})
 	if m.mode != modeList {
 		t.Errorf("quest notes closed to %v", m.mode)
+	}
+}
+
+// Concluir uma quest na aba Ativas a manda para o fim da lista, na seção das
+// concluídas de hoje, e o cursor passa para a próxima ativa.
+func TestCompletedTodayStayInActiveTab(t *testing.T) {
+	m := newTestModel(t)
+	frames(m, 30)
+	first := m.selected().Title
+	m.complete(*m.selected())
+	frames(m, 120)
+
+	if q := m.selected(); q == nil || q.Done || q.Title == first {
+		t.Fatalf("cursor should move to the next active quest, got %+v", q)
+	}
+	last := m.visible[len(m.visible)-1]
+	if !last.Done || last.Title != first {
+		t.Fatalf("completed quest should be last in the active tab, got %+v", last)
+	}
+	out := ansi.Strip(m.View())
+	if !strings.Contains(out, "CONCLUÍDAS HOJE") {
+		t.Errorf("missing completed-today section:\n%s", out)
+	}
+
+	// Concluída em outro dia, ela sai da aba Ativas.
+	m.now = m.now.AddDate(0, 0, 1)
+	m.rebuild(0)
+	for _, q := range m.visible {
+		if q.Done {
+			t.Errorf("yesterday's completion still in the active tab: %s", q.Title)
+		}
 	}
 }

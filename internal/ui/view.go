@@ -253,6 +253,9 @@ func (m *Model) list(width, height int) string {
 	for i, q := range m.visible {
 		group, icon := tr("SECUNDÁRIAS", "SIDE QUESTS"), m.ic.Side
 		switch {
+		case q.Done && !m.doneTab:
+			// Na aba Ativas, as concluídas hoje ficam juntas no fim.
+			group, icon = tr("CONCLUÍDAS HOJE", "COMPLETED TODAY"), m.ic.Done
 		case q.Done:
 			// Na aba Concluídas os grupos são os dias de conclusão.
 			group, icon = m.dayLabel(q.DoneAt), m.ic.Due

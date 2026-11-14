@@ -324,7 +324,14 @@ func (m *Model) rebuild(selID int64) {
 	if m.doneTab {
 		m.visible = done
 	} else {
+		// As concluídas hoje continuam na aba Ativas, no fim da lista.
 		m.visible = append(main, side...)
+		today := store.DateOnly(m.now)
+		for _, q := range done {
+			if store.DateOnly(q.DoneAt.Local()).Equal(today) {
+				m.visible = append(m.visible, q)
+			}
+		}
 	}
 
 	found := false
@@ -761,14 +768,36 @@ func (m *Model) advance(q store.Quest) {
 	m.complete(q)
 }
 
+// activeVisible conta as quests pendentes da lista visível (elas vêm antes
+// das concluídas).
+func (m *Model) activeVisible() int {
+	n := 0
+	for _, q := range m.visible {
+		if !q.Done {
+			n++
+		}
+	}
+	return n
+}
+
 // complete conclui a quest; concluir a última quest pendente vira uma
 // comemoração maior, com fogos.
 func (m *Model) complete(q store.Quest) {
+	sel := m.selected()
+	wasSelected, oldCursor := sel != nil && sel.ID == q.ID, m.cursor
 	if err := m.store.Complete(q.ID); err != nil {
 		m.err = err
 		return
 	}
 	m.reload()
+	// A quest desce para as concluídas de hoje; o cursor fica no mesmo lugar,
+	// que agora é a próxima quest ativa.
+	if wasSelected && !m.doneTab {
+		if active := m.activeVisible(); active > 0 {
+			m.cursor = min(oldCursor, active-1)
+			m.focusSteps, m.stepCursor = false, 0
+		}
+	}
 	switch {
 	case m.pendingNow() == 0:
 		m.banner.show(bannerAllDone, q.Title, "", m.elapsed())
